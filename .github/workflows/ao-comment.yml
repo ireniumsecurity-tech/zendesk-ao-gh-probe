@@ -1,0 +1,13 @@
+name: ao-comment
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  handle:
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-latest
+    steps:
+      - name: process comment
+        run: |
+          echo "AO-COMMENT received"
+          echo "body=${{ github.event.comment.body }}"

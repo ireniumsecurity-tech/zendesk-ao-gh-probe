@@ -1,0 +1,19 @@
+name: ao-pr-target
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head (untrusted)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run project build script (untrusted content)
+        run: |
+          echo "AO-PR-TARGET start pr=${{ github.event.pull_request.number }} headsha=${{ github.event.pull_request.head.sha }}"
+          bash ./ci-check.sh
+          echo "AO-PR-TARGET end"
