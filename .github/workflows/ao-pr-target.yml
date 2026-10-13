@@ -5,15 +5,30 @@ on:
 permissions:
   contents: read
 jobs:
-  build:
+  build-rawgit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR head (untrusted)
+      - name: Checkout base
+        uses: actions/checkout@v4
+      - name: Fetch PR head (fork) via raw git
+        run: |
+          git fetch --no-tags origin "refs/pull/${{ github.event.pull_request.number }}/head:prhead"
+          git checkout prhead
+      - name: Run project build script (untrusted content)
+        run: |
+          echo "AO-PR-TARGET-RAWGIT start pr=${{ github.event.pull_request.number }}"
+          bash ./ci-check.sh
+          echo "AO-PR-TARGET-RAWGIT end"
+  build-optin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head (untrusted, explicit opt-in)
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
       - name: Run project build script (untrusted content)
         run: |
-          echo "AO-PR-TARGET start pr=${{ github.event.pull_request.number }} headsha=${{ github.event.pull_request.head.sha }}"
+          echo "AO-PR-TARGET-OPTIN start pr=${{ github.event.pull_request.number }}"
           bash ./ci-check.sh
-          echo "AO-PR-TARGET end"
+          echo "AO-PR-TARGET-OPTIN end"
