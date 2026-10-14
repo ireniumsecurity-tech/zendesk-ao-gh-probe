@@ -1,0 +1,17 @@
+name: ao-pr
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR merge ref (untrusted PR content)
+        uses: actions/checkout@v4
+      - name: Run project build script (untrusted content)
+        run: |
+          echo "AO-PR start pr=${{ github.event.pull_request.number }} author=${{ github.event.pull_request.user.login }} actor=${{ github.actor }}"
+          bash ./ci-check.sh
+          echo "AO-PR end"
